@@ -1,0 +1,171 @@
+---
+title: "5DataTransform"
+author: "Avantika_Negi"
+date: "2023-01-07"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(nycflights13)
+library(tidyverse)
+```
+
+
+#dplyr
+##dplyr is a subset library of tidyverse used for manipulating tables
+```{r}
+flights
+```
+
+
+#basic ops
+
+filter()      #select by values 
+arrange()     #reorder rows
+select()      #pick by names 
+mutate()      #create new vars
+summary()     #colllapse to a single val
+
+ - group_by()   #divides tbales into groups 
+ 
+ 
+ #Filter 
+ 
+```{r}
+filter(flights, month == 1, day == 1)
+```
+
+
+# we want either of the two conditions true for the filtering operation
+```{r}
+filter(flights, month == 1 | day == 1)
+```
+
+# to save the work of the filter operation one needs to assign the output to a variable
+
+```{r}
+jan1 <- filter(flights, month == 1 | day == 1)
+```
+
+
+```{r}
+(jan1 <- filter(flights, month != 9)) #eveything except Sept
+```
+
+#Exclusive OR also exists 
+
+```{r}
+(jan1 <- filter(flights, !(month >9 & day > 15)))
+```
+
+#to have a range for flights in the summer time
+#frequently used operator, can be done with greater, less than and and operator but that is long, so %in% operator works so c(6, 7, 8) is useful
+#n. a value that does not exist in the table, toxic constant
+```{r}
+(jan1 <- filter(flights, month %in% c(6, 7, 8)))
+```
+
+
+
+#NA values 
+```{r}
+NA > 5
+```
+
+```{r}
+NA == 5
+```
+
+
+```{r}
+NA == NA   #What!!
+```
+
+
+```{r}
+NA == NA   #What!!
+x <- NA
+y <- NA
+x == y
+``` 
+# Well, we don't know this data, hence this weird output
+
+```{r}
+NA == NA   #What!!
+x <- NA
+y <- NA
+x == y
+is.na(NA)
+``` 
+
+
+
+#Arrange
+
+```{r}
+arrange(flights, year, month, day)
+```
+
+```{r}
+arrange(flights, year, desc(month), desc(day))
+```
+
+
+```{r}
+arrange(flights, year, desc(dep_delay))
+```
+
+#Select columns
+```{r}
+select(flights, year, month, day, dep_delay)
+```
+
+
+#makes it easier to read, if we don't care about year month or days 
+```{r}
+select(flights, -year, -month, -day)
+```
+
+
+```{r}
+select(flights, -year:day)
+```
+
+
+
+```{r}
+select(flights, -(year:day))
+```
+
+
+
+#Mutate
+```{r}
+flights_small <- select(flights,
+                        year:day, 
+                        ends_with("delay"),
+                        distance,
+                        air_time)
+
+mutate(flights_small,
+       gain = dep_delay - arr_delay,
+       speed = distance /air_time * 60)
+
+```
+
+
+```{r}
+flights_small <- select(flights,
+                        year:day, 
+                        ends_with("delay"),
+                        distance,
+                        air_time)
+
+mutate(flights_small,
+       gain = dep_delay - arr_delay,
+       speed = distance /air_time * 60)
+       hours = air_time / 60
+       gain_per_hour = gain / hours)
+
+```

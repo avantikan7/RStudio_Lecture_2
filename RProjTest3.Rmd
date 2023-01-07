@@ -1,0 +1,79 @@
+---
+title: "R Project Test"
+author: "AN"
+date: "2023-01-07"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+
+
+```{r cars}
+library(tidyverse)
+
+ggplot(diamonds, aes(carat, price)) +
+  geom_hex()
+ggsave("diamonds.pdf")
+
+write_csv(diamonds, "diamonds.csv")
+```
+
+#need to install the hex package from the store for this code chunk to run
+```{r cars}
+library(tidyverse)
+
+ggplot(diamonds, aes(carat, price)) +
+  geom_point()
+ggsave("diamonds.pdf")
+
+write_csv(diamonds, "diamonds.csv")
+```
+
+
+#need to go manually and create a folder out in the directory so that this chnk can run and assign the files
+```{r cars}
+library(tidyverse)
+
+ggplot(diamonds, aes(carat, price)) +
+  geom_hex()
+ggsave("out/diamonds.pdf")
+
+write_csv(diamonds, "out/diamonds.csv")
+```
+
+#by wrapping the assigmnent it also prints out the output
+#(proj <- 3*sin(pi/4)) gives the answer
+#use single digits when need throwaway variables to store values temporarrily
+#three letter variabvles are better 
+
+#camelCase, snake_case, multiple words while assigning varibale names
+
+#R.uses.periods, use snake_case, hate periods, have no meaning here unlike other languages 
+
+#type Alt+dash symbol willl insert the assignment operator
+
+##Read about projects in Section 8 from R4DS for this class 
+
+
+
+
+
