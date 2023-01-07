@@ -1,0 +1,59 @@
+---
+title: "Tibbles_Data_Import"
+author: "Avantika_Negi"
+date: "2023-01-07"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+#quick function call
+as_tibble(data.frame)
+#doesn't convert strings to factors 
+
+##TRANSPOSED TRIBBLE, construct tables in text 
+
+```{r}
+tbl <- tibble(
+  #function call like facet grid for example 
+    ~x, ~y, ~z, 
+    ####################
+    "a", 2, 3.6,
+    "b", 6, 4.7,
+  
+)
+
+```
+
+#Chapter 11 in R4DS
+#table with small number of measures, can be worked on with tribble and made into a csv file
+
+```{r}
+challenge <- read_csv(readr_example("challenge.csv"))
+```
+
+
+```{r}
+challenge <- read_csv(readr_example("challenge.csv"))
+problems(challenge)
+```
+
+#We need to specify the data types in the columns
+```{r}
+challenge <- read_csv(readr_example("challenge.csv"),
+                      col_types = cols(
+                                    x = col_double(),
+                                    y = col_date()
+                      ))
+show_col_types = FALSE
+challenge
+```
+
+
+
+
+
+
+
