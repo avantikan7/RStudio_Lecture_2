@@ -1,0 +1,175 @@
+---
+title: "Summarize"
+author: "Avantika_Negi"
+date: "2023-01-07"
+output: html_document
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(nycflights13)
+library(tidyverse)
+```
+
+#delay of 12 mins, reduced evrything to one value
+```{r}
+summarize(flights, delay = mean(dep_delay, na.rm = TRUE))
+```
+
+#freely omit NA values, departure column has NAs in it. We have to consider exactly what we want in this case
+```{r}
+summarize(flights, delay = mean(dep_delay))
+```
+
+#Going to group by the day of the year, we want to have the mean depaarture delay now.
+```{r}
+by_day <- group_by(flights, year, month, day)
+summarize(by_day, delay = mean(dep_delay, na.rm = TRUE))
+```
+
+
+#microplate reader readings for three technical replicates 
+#specify each condition in the three columns, rows and group them by the exerimental condition
+
+
+```{r}
+summarize(flights, delay = n())  #mean(dep_delay, na.rm = TRUE))
+```
+
+
+
+# Find the realtionship between distance and average delay fro each destination
+
+#group flights by destination
+
+#summarize to compute distance, average delay and number of flgihts
+
+# filter, to remove noisy points and Honululu airport
+
+#Pipe operator, code reads easily
+```{r}
+delays <- flights %>%
+  group_by(dest) %>%
+  summarize(
+    count = n(),
+    dist = mean(distance, na.rm = TRUE),
+    delay = mean(arr_delay, na.rm = TRUE)
+  ) %>%
+  filter(count > 20, dest != "HNL")
+delays
+``` 
+#The grouping is by destination, not by yr, month. The summarize only gives the columns included in the three lines and the grouping variable (lose a lot of columns). 
+
+
+```{r}
+delays <- flights %>%
+  group_by(dest) %>%
+  summarize(
+    count = n(),
+    dist = mean(distance, na.rm = TRUE),
+    delay = mean(arr_delay, na.rm = TRUE),
+    day = first(day)
+  ) %>%
+  filter(count > 20, dest != "HNL")
+delays
+``` 
+
+
+## When using a dataframe function na.rm in r refers to the logical parameter that tells the function whether or not to remove NA values from the calculation. 
+## It literally means NA remove. It is neither a function nor an operation. It is simply a parameter used by several dataframe functions. They include colSums(), rowSums(), colMeans() and rowMeans(). When na.rm is TRUE, the function skips over any NA values. 
+## However, when na.rm is FALSE, then it returns NA from the calculation being done on the entire row or column.
+
+
+
+#Alternative to PIPE
+#filter(summarize(group_by(flights), dest), count = ...), count > 20 ...)
+
+```{r}
+#making another table
+not_cancelled <- flights %>% filter(!is.na(dep_delay), !is.na(arr_delay))
+
+delays <- not_cancelled %>%
+  group_by(tailnum) %>%
+  summarize(
+    delay = mean(arr_delay)
+  )
+  
+ggplot(data = delays, mapping = aes(x = delay)) + 
+  geom_freqpoly(binwidth = 10)
+
+```
+
+
+```{r}
+not_cancelled <- flights %>% filter(!is.na(dep_delay), !is.na(arr_delay))
+
+#writing a table into a ggplot!!!
+p <- not_cancelled %>%
+   group_by(tailnum) %>%
+   summarize(
+     delay = mean(arr_delay),
+     n = n()
+   ) %>%
+   
+   ggplot(mapping = aes(y = delay, x = n)) + 
+     geom_point(alpha = 1/10)
+p
+
+```
+
+
+
+```{r}
+not_cancelled <- flights %>% filter(!is.na(dep_delay), !is.na(arr_delay))
+
+#writing a table into a ggplot!!!
+p <- not_cancelled %>%
+   group_by(tailnum) %>%
+   summarize(
+     delay = mean(arr_delay),
+     n = n()
+   ) %>%
+   filter(n > 25) %>%
+   ggplot(mapping = aes(y = delay, x = n)) + 
+     geom_point(alpha = 1/10)
+p
+
+```
+
+
+#CHAPTER 7.3, 7.7
+
+
+#Demo histograms
+```{r}
+ggplot(data = diamonds) +
+  geom_histogram(mapping = aes(x = carat), binwidth = 0.5)
+```
+#way of looking at probability densities
+
+
+```{r}
+diamonds %>%
+  filter(carat < 3) %>%
+  ggplot() +
+  geom_freqpoly(mapping = aes(x = carat), binwidth = 0.5)
+```
+
+
+#Nice thing about freqpoly allows one to compare 
+```{r}
+diamonds %>%
+  filter(carat < 3) %>%
+  ggplot() +
+  geom_freqpoly(mapping = aes(x = carat, color = cut), binwidth = 0.5)
+```
+
+
+```{r}
+  ggplot(diamonds) +
+  geom_freqpoly(aes(carat, color = cut), binwidth = 0.5)
+```
+
+
+
