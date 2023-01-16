@@ -1,0 +1,135 @@
+---
+title: "Lecture_5a_Tidy_Data"
+author: "Avantika_Negi"
+date: "2023-01-16"
+output: html_document
+---
+## Arranging data appropriately so that it can plug into tiderverse and ggplot and other functions. 
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(readr)
+```
+#Chapter 12 from R4DS
+###know the situations when these manipulations on tidying dats are not needed 
+
+
+## 1. Each variable must have its own column
+## 2. Each observation it its own row
+## 3. Each value in its own cell. 
+
+```{r}
+##Series of tidyverse tables 
+table1
+
+# vectorization: define a function on one of the rows and tell it to apply to a column in the same  way since the data type is same.
+# Always have copies of your data set 
+
+```
+
+
+
+```{r}
+table4a
+
+#each column is a year 
+## We want each year as a column, reshape this to look like the table above
+## Squeeze it to a longer table using pivot 
+table4a %>%
+  pivot_longer(c(`1999`, `2000`), names_to = "year", values_to = "cases")
+
+```
+
+```{r}
+tidy4a <- table4a %>%
+  pivot_longer(c(`1999`, `2000`), names_to = "year", values_to = "cases")
+tidy4a
+```
+
+
+
+```{r}
+tidy4b <- table4a %>%
+  pivot_longer(c(`1999`, `2000`), names_to = "year", values_to = "population")
+tidy4b
+```
+
+```{r}
+##joining these tables 4a and 4b togethe: merging country, yr 
+
+
+tidy4 <- left_join(tidy4a, tidy4b)
+ggplot(tidy4, aes(cases, population)) + 
+  geom_point()
+
+```
+
+
+```{r}
+table2
+## does not really look tidy 
+## aesthetics are columns, cant do the previous plot with this table
+```
+
+
+
+
+
+
+```{r}
+table2
+ggplot(table2, aes(year, count)) + geom_point()
+  
+## We need to spread these values out 
+```
+
+
+
+```{r}
+table2 %>%
+  pivot_wider(names_from = type, values_from = count)
+```
+  
+  
+  
+```{r}
+## Single cell has more than one value in it
+## Split this column into two new populations 
+table3
+table3 %>%
+  separate(rate, into = c("cases", "populations"))
+```
+
+# Look at chapter 14 and 16 in R4DS on Strings 
+```{r}
+## Single cell has more than one value in it
+## Split this column into two new populations 
+table3
+
+## separators is useful for seraching amongst strings 
+table3 %>%
+  separate(rate, into = c("cases", "populations"), sep = "foo")
+```
+
+```{r}
+# nycflights table and separate it to hours and minutes 
+nycflights13::flights %>%
+  select(year, month, day, dep_time) %>%
+  separate(dep_time, into = c("hour", "minute"), sep = 2)
+## interpreted as charcter positions to split at 
+```
+
+
+```{r}
+table5 %>%
+  unite(new, century, year, sep = "")
+
+```
+
+
+
+
+### Small tables examples: look at the exercises at the end of Chapter 12 
+
+
+
