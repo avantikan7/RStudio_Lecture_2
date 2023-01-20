@@ -1,0 +1,293 @@
+---
+title: "Practice_Session_Jan_17"
+author: "Avantika_Negi"
+date: "2023-01-18"
+output: html_document
+---
+### setwd("/path/to/my/CoolProject")
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(readr)
+```
+
+#Chapter 12 from R4DS
+###know the situations when these manipulations on tidying dats are not needed 
+
+
+## 1. Each variable must have its own column
+## 2. Each observation it its own row
+## 3. Each value in its own cell. 
+
+```{r}
+##Series of tidyverse tables 
+class(iris)
+iris_tibble <- as_tibble(iris)
+iris_tibble
+```
+```{r}
+##Series of tidyverse tables 
+class(iris)
+df <- tibble(x = 1:3, y = 3:1)
+
+add_row(df, x = 4, y = 0)
+add_row(df, x = 4, y = 0, .before = 2)
+
+add_row(df, x = 4:5, y = 0:-1)
+add_row(df, x = 4)
+
+```
+
+```{r}
+annoying <- tibble(
+  `1` = 1:10,
+  `2` = `1` * 2 + rnorm(length(`1`))
+)
+
+#extracting the variable called 1
+annoying$`1`
+
+#Plotting a scatter plot of `1` vs `2`
+ggplot(annoying, mapping = aes(x = `1`, y = `2`)) + 
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE)
+
+mutate(annoying, `3` = `2`/`1`)
+(annoying <- rename(annoying, one = `1`, two = `2`))
+
+```
+
+```{r}
+table2
+table1
+table4a
+#Compute cases per year
+table2_case <- table2 %>% 
+  filter(type == "cases")
+
+#Extracting matching population per country per year 
+table2_popu <- table2 %>% 
+  filter(type == "population")
+  
+#Combining them
+(table2_modified <- tibble(
+  country = table2_case$country,
+  year = table2_case$year,
+  class = table2_case$count,
+  population = table2_popu$count
+))
+
+table1 == table2_modified
+#Alternative approach using tidyr
+table2 %>%
+  filter()
+  
+# 3. Recreate the plot showing change in cases over time using table2 
+# instead of table1. What do you need to do first?
+
+# First recall:
+table1
+ggplot(table1, aes(year, cases)) +
+  geom_line(aes(group = country), color = "grey50") +
+  geom_point(aes(color = country)) 
+# only two years of data
+```
+
+#LinKedIn _Learning Jan 18th 2023
+#Data_Wrangling_In_R
+
+
+```{r}
+CO2
+CO2_tibble <- as_tibble(CO2)
+CO2_tibble
+print(CO2_tibble, n = 10)
+
+#Working with tibbles
+name <- c("A", "van", "ti", "ka")
+eyecolor <- c("brown", "black", "yellow", "green")
+people <- tibble(name, eyecolor)
+print(people)
+unique(people$eyecolor)
+filter(people, eyecolor == "black")
+##filter(people, eyecolor == "black" | birthyear > 2002)
+```
+
+
+
+
+
+```{r}
+inspections <- read_csv('http://594442.youcanlearnit.net/inspections.csv')
+glimpse(inspections)
+
+```
+
+
+
+
+```{r}
+names <- c('ID', 'DBAName', 'AKAName', 'License', 'FacilityType', 'Risk', 'Address', 'City', 'State', 'Zip', 'InspectionDate', 'InspectionType', 'Results', 'Violations', 'Latitude', 'Longitude', 'Location')
+
+inspections <- read_csv('http://594442.youcanlearnit.net/inspections.csv', col_names = names)
+#skip the first line of the data file
+inspections <- read_csv('http://594442.youcanlearnit.net/inspections.csv', col_names = names, skip = 1)
+glimpse(inspections)
+```
+
+
+```{r}
+inpatient <- read_tsv('http://594442.youcanlearnit.net/inpatient.tsv')
+
+names = c('DRG', 'ProviderID', 'Name', 'Address', 'City', 'State', 'ZIP', 'Region', 'Discharges', 'AvergaeCharges', 'AverageTotalPayments', 'Averagemedicarepayments')
+inpatient <- read_tsv('http://594442.youcanlearnit.net/inpatient.tsv',
+                      col_names = names, skip = 1)
+glimpse(inpatient)
+
+types <- 'ccccccccinnn'
+impatient <- read_tsv('http://594442.youcanlearnit.net/inpatient.tsv', col_names = names, skip = 1, col_types = types)
+
+```
+
+```{r}
+##library(tidyverse)
+##library(readxl)
+###importing delimited and fixed-width files into R 
+## Excel files 
+##breakfast <- read_excel('breakfast.xslx', skip = 3)
+##glimpse(breakfast)
+
+##names <- c('Year', 'FreeStudents', 'PaidStudents', 'totalStudents', 'PercentFree')
+##breakfast <- read_excel('breakfast.xslx', skip = 3, col_names = names)
+##glimpse(breakfast)
+
+##breakfast <- breakfast %>%
+  ##mutate(FreeStudents = FreeStudents * 1000000,
+         ###PaidStudents = paidStudents * 100000)
+
+```
+
+
+
+
+```{r}
+library(nycflights13)
+planes
+airlines
+##nycflights13$tailnum
+#flights: year, month, day, hour, origin, dest, tailnum
+
+##you need origin, dest, from flights.
+## you want to draw the route so latitude (lat) and lognitude (lon) from 
+## airports table.
+## we need to merge flights with airports twice according to jrnlod's github.
+## once to get location of origin and once to get location of dest.
+planes %>%
+  count(tailnum) %>%
+  filter(n > 1) #if each tailnum is unique, there should NOT be more than 1.
+  
+weather %>%
+  count(year, month, day, hour, origin) %>%
+  filter(n > 1)
+
+# Finding an explicit primary key is difficult! E.g.
+flights %>%
+  count(year, month, day, flight) %>%
+  filter(n > 1)
+
+flights %>%
+  count(year, month, day, tailnum) %>%
+  filter(n > 1)
+
+```
+
+
+```{r}
+library(tidyverse)
+pew <- read_csv("http://594442.youcanlearnit.net/pew.csv")
+pew
+
+##exclude religion from the table 
+pew.long <- pivot_longer(pew, !religion, names_to = 'income', values_to = 'freq')
+
+pew.long
+
+weather <- read_csv("http://594442.youcanlearnit.net/mexicanweather.csv")
+weather
+
+weather.wide <- pivot_wider(weather, names_from = 'element', values_from = 'value')
+weather.wide
+
+```
+
+#Datatype Conversion in R
+
+```{r}
+foulshots <- c(18, 22, 45, 13, 6)
+sum(foulshots)
+
+foulshots_strings <- c('18', '22', '45', '13', '6')
+#sum(foulshots_strings)
+class(foulshots_strings)
+
+foulshots_converted <- as.numeric(foulshots_strings)
+class(foulshots_converted)
+sum(foulshots_converted)
+
+is.numeric(foulshots_strings)
+is.character(foulshots_strings)
+```
+
+```{r}
+names <- c('Mike', 'Sally', 'Dennis', 'Rae', 'Ian', 'Sue')
+teams <- c(1,1,1,2,2,2)
+
+assignments <- tibble(names, teams
+                    )
+assignments
+###names= characters, teams = numeric
+assignments <- assignments %>%
+  mutate(teams = as.factor(teams))
+
+assignments 
+
+is.factor(assignments$names)
+is.factor(assignments$teams)
+```
+
+
+#Deconstructing dates and times 
+```{r}
+
+##mdy(), dmy() and ymd()
+library(tidyverse)
+library(lubridate)
+
+##to display year as a separate column in the table 
+weather <- weather %>% 
+  mutate(year = year(date), month = month(date), day = day(date))
+
+yday('2018-04-01')
+mdy('04/01/2018')
+
+```
+
+```{r}
+
+##Outliers is data that should be removed from the dataset, usually scatterplots and histpgrams are used to detect outliers 
+###sometimes they are useful points and maybe retained in the set, depending upon the data
+
+inpatient <- read_tsv('http://594442.youcanlearnit.net/inpatient.tsv')
+
+names = c('DRG', 'ProviderID', 'Name', 'Address', 'City', 'State', 'ZIP', 'Region', 'Discharges', 'AverageCharges', 'AverageTotalPayments', 'Averagemedicarepayments')
+inpatient <- read_tsv('http://594442.youcanlearnit.net/inpatient.tsv',
+                      col_names = names, skip = 1)
+glimpse(inpatient)
+```
+
+
+
+```{r}
+print("Hey")
+```
+

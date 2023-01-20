@@ -1,0 +1,41 @@
+---
+title: "Practice_Session_4"
+author: "Avantika_Negi"
+date: "2023-01-19"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(readr)
+```
+
+```{r}
+names <- c('DRG', 'ProviderID', 'Name', 'Address', 'City', 'ZIP', 'Region', 'Discharge', 'AverageCharges', 'Zip', 'AverageTotalPayment', 'AverageMedicarePayments')
+
+types = 'ccccccccinnn'
+inpatient <- read_tsv('http://594442.youcanlearnit.net/inpatient.tsv', col_names = names, skip = 1, col_types = types)
+unique(inpatient$DRG)
+
+separate(inpatient, DRG, c('DRGcode', 'DRGdescription'), '-')
+
+inpatient$DRG[45894]
+inpatient <- separate(inpatient, DRG, c('DRGcode', 'DRGdescription'), 4)
+View(inpatient)
+
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+

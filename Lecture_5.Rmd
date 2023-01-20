@@ -1,5 +1,5 @@
 ---
-title: "Lecture_5a_Tidy_Data"
+title: "Lecture_5a_Tidy_Data_5b_factors"
 author: "Avantika_Negi"
 date: "2023-01-16"
 output: html_document
@@ -126,10 +126,130 @@ table5 %>%
 
 ```
 
-
-
-
+#Chapter 15: FACTORS
 ### Small tables examples: look at the exercises at the end of Chapter 12 
 
+```{r}
+#install.packages('XQuartz', repos = "www.xquartz.org")
+x1 <- c("Dec", "Apr", "Jan", "Mar")
+x2 <- c("Dec", "Apr", "Jam", "Mar")
+sort(x1)
+##converting strings to factors
+
+month_levels <- c(
+  "Jan", "Feb", "Mar", "Apr", "May", "Jun", 
+  "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+)
+y2 <- parse_factor(x2, levels =  month_levels)
+View(gss_cat)
+relig_summary <- gss_cat %>%
+  group_by(relig) %>%
+  summarise(
+    age = mean(age, na.rm = TRUE),
+    tvhours = mean(tvhours, na.rm = TRUE),
+    n = n()
+  )
+relig_summary
+
+ggplot(relig_summary, aes(tvhours, relig)) +
+  geom_point()
+##But we cant really interpret anything from  this plot, we need more structure to this. 
+
+##factoring ordering functions are handy here 
+###tvhours is a continuous variable a no. not a factor, religion is interesting to play with 
+ggplot(relig_summary, aes(tvhours, fct_reorder(relig, tvhours))) +
+  geom_point()
+```
+###greatest to least sorted:
+###JUST FOR THE Y-AXIS LABEL HERE 
+###Renamed the column of the table in the correct order and piped that into ggplot 
+```{r}
+
+relig_summary %>%
+  mutate(relig = fct_reorder(relig, tvhours)) %>%
+  ggplot(relig_summary, mapping = aes(tvhours, relig)) +
+  geom_point()
+
+
+```
+
+```{r}
+rincome_summary <- gss_cat %>%
+  group_by(rincome) %>%
+  summarise(
+    age = mean(age, na.rm = TRUE),
+    tvhours = mean(tvhours, na.rm = TRUE),
+    n = n()
+  )
+
+##Income Summary: ordering on the basis of age  
+ggplot(rincome_summary, aes(age, rincome, age)) + 
+  geom_point()
+
+ggplot(rincome_summary, aes(age, fct_reorder(rincome, age))) + geom_point()
+##Keeping the not applicable lable at the bottom 
+ggplot(rincome_summary, aes(age, fct_relevel(rincome, "Not applicable"))) + geom_point()
+
+
+```
+
+
+
+##Getting rid of unknown ages and counting the number of each by marital status, the grouping the ages and calculating the proportion
+```{r}
+by_age <- gss_cat %>%
+  filter(!is.na(age)) %>%
+  count(age, marital) %>%
+  group_by(age) %>%
+  mutate(prop = n / sum(n))
+by_age
+
+ggplot(by_age, aes(age, prop, colour = marital)) +
+  geom_line(na.rm = TRUE) ##removing NAs 
+
+##cant tell the fiff between not married and never married Kovar Lab
+###trend lines: key mathcing up with the end lines: closest data, makes it easier to see the trend without looking at the graph/data 
+##two things have to be reordered: need x and y value to order, hence reorder2
+ggplot(by_age, aes(age, prop, colour = fct_reorder2(marital, age, prop))) +
+  geom_line() +
+  labs(colour = "marital")
+```
+
+
+
+```{r}
+
+##sorting by freq and reverse it 
+gss_cat %>%
+  mutate(marital = marital %>% fct_infreq() %>% fct_rev()) %>%
+  ggplot(aes(marital)) +
+    geom_bar()
+
+```
+
+
+#VERY USEFUL
+```{r}
+##labels evolve with experiments, or maybe typos, not settled on common conventions
+###the coding of the factors in thatb case has to be changed 
+
+gss_cat %>% count(partyid)
+#change the column with recoded factors
+gss_cat %>%
+  mutate(partyid = fct_recode(partyid,
+    "Republican, strong"    = "Strong republican",
+    "Republican, weak"      = "Not str republican",
+    "Independent, near rep" = "Ind,near rep",
+    "Independent, near dem" = "Ind,near dem",
+    "Democrat, weak"        = "Not str democrat",
+    "Democrat, strong"      = "Strong democrat",
+    "Other"                 = "No answer",
+    "Other"                 = "Don't know",
+    "Other"                 = "Other party"
+  )) %>%
+  count(partyid)
+##can combine too, if tring isnt imp, by changing label names 
+
+```
 
 

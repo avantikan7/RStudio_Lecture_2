@@ -1,0 +1,202 @@
+---
+title: "Lecture_6a_Functions"
+author: "Avantika_Negi"
+date: "2023-01-19"
+output: html_document
+---
+#GO THROUGH Chapter 19 in R4DS 
+#Chapter 17, 18-21
+
+# Functions
+# When to use?
+# * When you have cut-and-pasted three times, it is good to start constructing a function to do the job
+# 1. Named, so easier label to understand
+# 2. Only one place to edit 
+# 3. Cut & paste errors go away
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+
+##```{ r name-here}
+
+##helpful for constructing models 
+
+##several lines of code
+
+### one function or operation, function; jump back and forth between code blocks a
+
+df <- tibble::tibble(
+  a = rnorm(10), #gaussian distribution
+  b = rnorm(10),
+  c = rnorm(10),
+  d = rnorm(10)
+)
+##rescale the vectors so that the values lie between 0 and 1
+##one can name functions in R
+rescale01 <- function(x)  {
+  xmin <- min(x, na.rm = TRUE)
+  xmax <- max(x, na.rm = TRUE)
+  (x - xmin) / (xmax - xmin)
+}
+
+rescale01(c(-10, 0, 10))
+
+df$a <- rescale01(df$a)
+View(df)
+# df$b <- (df$b - min(df$b, na.rm = TRUE)) / 
+#   (max(df$b, na.rm = TRUE) - min(df$a, na.rm = TRUE))
+# df$c <- (df$c - min(df$c, na.rm = TRUE)) / 
+#   (max(df$c, na.rm = TRUE) - min(df$c, na.rm = TRUE))
+# df$d <- (df$d - min(df$d, na.rm = TRUE)) / 
+#   (max(df$d, na.rm = TRUE) - min(df$d, na.rm = TRUE))
+# View(df)
+
+```
+
+#TESTS
+```{r}
+rescale0m1 <- function(x, rm = TRUE, scale_factor = 1)  {
+  xmean <- mean(x, na.rm = rm)
+  xmin <- min(x, na.rm = TRUE)
+  xmax <- max(x, na.rm = TRUE)
+  scale_factor * (x - xmin) / (xmax - xmin)
+}
+##function call
+rescale0m1(c(-10, 0, NA, 10), scale_factor = 20)#rm = FALSE)
+```
+
+#Good short argument names 
+data: x, y, z #vectors
+dataframe: df df_foo
+weights: w
+indices: i, j
+length: n
+everything else-- gets a better name
+
+
+
+```{r}
+
+test_that("Rescale uniform list", {
+  expect_equal(rescale01(c(-10, 0, 10)), c(0.0, 0.3, 1.0))
+}
+)
+
+```
+
+#Lecture 6b Iteration and Flow Control
+##looping, if-then statements
+
+##Conditional execution
+
+
+
+if (condition) {
+    # Code that runs if it is true 
+} else {
+#Code that runs if the condition is false 
+}
+
+
+if (condition1) {
+    # Code that runs if it is true 
+} else if (condition 2) {
+#Code that runs if the condition is false 
+} else {
+#Code that runs if the condition is false 
+}
+
+```{r}
+#Function that computes weighted statistics for the given data 
+wt_mean <- function(x, w) {
+  if (length(x) != length(w)) {
+    stop("`x` and `w` must be the same length", call. = FALSE)
+      
+  }
+  sum(x * w) / sum(w)
+}
+
+#w and x are of diff lengths
+wt_mean(1:6, 1:3)
+
+
+```
+
+
+```{r}
+
+foo <- function(x) {
+  if ( length(x) != 1) {
+      stop("`x` must have length 1")
+  }
+  if ( x == 3 || x ==7) {
+    # this calculation is simple
+    return(-7)
+  }
+  # But here is a big calc
+  # ...
+  # ...
+  x
+}
+foo(10)
+
+```
+
+
+## Having an explicit return is good because in a long code one forgets where they wrote the function header
+
+```{r}
+foo <- function(x) {
+  if (x != 0) {
+    # But here is a big calc
+  # ...
+  # ...
+  } else {
+    # this calculation is simple
+    
+  }
+}
+foo(10)
+```
+
+#For loops
+
+```{r}
+
+output <- vector("double", ncol(df)) #preallocated output, if possible
+
+for (i in seq_along(df)) { #defining the sequence
+    output[[i]] <- median(df[[i]])
+}
+output
+
+```
+
+for(i in seq_along(df)) #index values i
+```{r}
+
+xs <- c("A", "B", "C")
+for(x in xs) {
+    print(x)
+}
+```
+
+
+
+```{r}
+for (nm in names(df))  { 
+    print(nm)
+    print(median(df[[nm]]))
+}
+
+```
+
+
+
+
+
+
+
+
+
